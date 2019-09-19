@@ -50,7 +50,7 @@ public class SpeechRecognitionPlugin implements MethodCallHandler, RecognitionLi
         recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        recognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, false);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
     }
 
@@ -59,7 +59,6 @@ public class SpeechRecognitionPlugin implements MethodCallHandler, RecognitionLi
         switch (call.method) {
             case "speech.logger":
                 logger = true;
-                result.success(true);
                 break;
             case "speech.activate":
                 // FIXME => Dummy activation verification : we assume that speech recognition permission
@@ -130,7 +129,7 @@ public class SpeechRecognitionPlugin implements MethodCallHandler, RecognitionLi
     @Override
     public void onEndOfSpeech() {
         handleLog("onEndOfSpeech");
-        speechChannel.invokeMethod("speech.onRecognitionComplete", transcription);
+        speechChannel.invokeMethod("speech.endOfSpeech", transcription);
     }
 
     @Override

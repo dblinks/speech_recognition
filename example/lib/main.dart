@@ -50,6 +50,7 @@ class _MyAppState extends State<MyApp> {
     _speech.setCurrentLocaleHandler(onCurrentLocale);
     _speech.setRecognitionStartedHandler(onRecognitionStarted);
     _speech.setRecognitionResultHandler(onRecognitionResult);
+    _speech.setSpeechEndCallbackHandler(onSpeechEnd);
 
     _speech.setErrorHandler(errorHandler);
     _speech
@@ -107,10 +108,10 @@ class _MyAppState extends State<MyApp> {
 
   List<CheckedPopupMenuItem<Language>> get _buildLanguagesWidgets => languages
       .map((l) => new CheckedPopupMenuItem<Language>(
-            value: l,
-            checked: selectedLang == l,
-            child: new Text(l.name),
-          ))
+    value: l,
+    checked: selectedLang == l,
+    child: new Text(l.name),
+  ))
       .toList();
 
   void _selectLangHandler(Language lang) {
@@ -136,8 +137,8 @@ class _MyAppState extends State<MyApp> {
       _speech.cancel().then((result) => setState(() => _isListening = result));
 
   void stop() => _speech.stop().then((result) {
-        setState(() => _isListening = result);
-      });
+    setState(() => _isListening = result);
+  });
 
   void onSpeechAvailability(bool result) =>
       setState(() => _speechRecognitionAvailable = result);
@@ -145,7 +146,7 @@ class _MyAppState extends State<MyApp> {
   void onCurrentLocale(String locale) {
     print('_MyAppState.onCurrentLocale... $locale');
     setState(
-        () => selectedLang = languages.firstWhere((l) => l.code == locale));
+            () => selectedLang = languages.firstWhere((l) => l.code == locale));
   }
 
   void onRecognitionStarted() => setState(() => _isListening = true);
@@ -155,4 +156,8 @@ class _MyAppState extends State<MyApp> {
   void onRecognitionComplete() => setState(() => _isListening = false);
 
   void errorHandler() => activateSpeechRecognizer();
+
+  void onSpeechEnd() {
+    print("Speech endede");
+  }
 }

@@ -26,8 +26,10 @@ class SpeechRecognition {
 
   VoidCallback recognitionStartedHandler;
 
+  VoidCallback speechEndCallbackHandler;
+
   StringResultHandler recognitionCompleteHandler;
-  
+
   VoidCallback errorHandler;
 
   /// ask for speech  recognizer permission
@@ -39,7 +41,7 @@ class SpeechRecognition {
 
   /// cancel speech
   Future cancel() => _channel.invokeMethod("speech.cancel");
-  
+
   /// stop listening
   Future stop() => _channel.invokeMethod("speech.stop");
 
@@ -54,6 +56,10 @@ class SpeechRecognition {
         break;
       case "speech.onSpeech":
         recognitionResultHandler(call.arguments);
+        break;
+      case "speech.endOfSpeech":
+        print("end of speech, transcription may have not arrived yet");
+        speechEndCallbackHandler();
         break;
       case "speech.onRecognitionStarted":
         recognitionStartedHandler();
@@ -85,8 +91,11 @@ class SpeechRecognition {
   void setRecognitionCompleteHandler(StringResultHandler handler) =>
       recognitionCompleteHandler = handler;
 
+  void setSpeechEndCallbackHandler(VoidCallback handler) =>
+      speechEndCallbackHandler = handler;
+
   void setCurrentLocaleHandler(StringResultHandler handler) =>
       currentLocaleHandler = handler;
-  
+
   void setErrorHandler(VoidCallback handler) => errorHandler = handler;
 }
