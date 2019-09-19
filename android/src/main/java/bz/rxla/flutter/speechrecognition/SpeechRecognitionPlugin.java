@@ -7,6 +7,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
+
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -28,6 +29,7 @@ public class SpeechRecognitionPlugin implements MethodCallHandler, RecognitionLi
     private String transcription = "";
     private Intent recognizerIntent;
     private Activity activity;
+    private Boolean logger = false;
 
     /**
      * Plugin registration.
@@ -55,11 +57,15 @@ public class SpeechRecognitionPlugin implements MethodCallHandler, RecognitionLi
     @Override
     public void onMethodCall(MethodCall call, Result result) {
         switch (call.method) {
+            case "speech.logger":
+                logger = true;
+                result.success(true);
+                break;
             case "speech.activate":
                 // FIXME => Dummy activation verification : we assume that speech recognition permission
                 // is declared in the manifest and accepted during installation ( AndroidSDK 21- )
                 Locale locale = activity.getResources().getConfiguration().locale;
-                Log.d(LOG_TAG, "Current Locale : " + locale.toString());
+                handleLog("Current Locale : " + locale.toString());
                 speechChannel.invokeMethod("speech.onCurrentLocale", locale.toString());
                 result.success(true);
                 break;
@@ -92,45 +98,51 @@ public class SpeechRecognitionPlugin implements MethodCallHandler, RecognitionLi
         return new Locale(localeParts[0], localeParts[1]);
     }
 
+    public void handleLog(String log) {
+        if (logger) {
+            Log.d(LOG_TAG, log);
+        }
+    }
+
     @Override
     public void onReadyForSpeech(Bundle params) {
-        Log.d(LOG_TAG, "onReadyForSpeech");
+        handleLog("onReadyForSpeech");
         speechChannel.invokeMethod("speech.onSpeechAvailability", true);
     }
 
     @Override
     public void onBeginningOfSpeech() {
-        Log.d(LOG_TAG, "onRecognitionStarted");
+        handleLog("onRecognitionStarted");
         transcription = "";
         speechChannel.invokeMethod("speech.onRecognitionStarted", null);
     }
 
     @Override
     public void onRmsChanged(float rmsdB) {
-        Log.d(LOG_TAG, "onRmsChanged : " + rmsdB);
+        handleLog("onRmsChanged : " + rmsdB);
     }
 
     @Override
     public void onBufferReceived(byte[] buffer) {
-        Log.d(LOG_TAG, "onBufferReceived");
+        handleLog("onBufferReceived");
     }
 
     @Override
     public void onEndOfSpeech() {
-        Log.d(LOG_TAG, "onEndOfSpeech");
+        handleLog("onEndOfSpeech");
         speechChannel.invokeMethod("speech.onRecognitionComplete", transcription);
     }
 
     @Override
     public void onError(int error) {
-        Log.d(LOG_TAG, "onError : " + error);
+        handleLog("onError : " + error);
         speechChannel.invokeMethod("speech.onSpeechAvailability", false);
         speechChannel.invokeMethod("speech.onError", error);
     }
 
     @Override
     public void onPartialResults(Bundle partialResults) {
-        Log.d(LOG_TAG, "onPartialResults...");
+        handleLog("onPartialResults...");
         ArrayList<String> matches = partialResults
                 .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         if (matches != null) {
@@ -141,17 +153,17 @@ public class SpeechRecognitionPlugin implements MethodCallHandler, RecognitionLi
 
     @Override
     public void onEvent(int eventType, Bundle params) {
-        Log.d(LOG_TAG, "onEvent : " + eventType);
+        handleLog("onEvent : " + eventType);
     }
 
     @Override
     public void onResults(Bundle results) {
-        Log.d(LOG_TAG, "onResults...");
+        handleLog("onResults...");
         ArrayList<String> matches = results
                 .getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         if (matches != null) {
             transcription = matches.get(0);
-            Log.d(LOG_TAG, "onResults -> " + transcription);
+            handleLog("onResults -> " + transcription);
             sendTranscription(true);
         }
         sendTranscription(false);
