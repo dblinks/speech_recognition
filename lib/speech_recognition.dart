@@ -1,6 +1,6 @@
 import 'dart:async';
-
 import 'dart:ui';
+
 import 'package:flutter/services.dart';
 
 typedef void AvailabilityHandler(bool result);
@@ -8,8 +8,7 @@ typedef void StringResultHandler(String text);
 
 /// the channel to control the speech recognition
 class SpeechRecognition {
-  static const MethodChannel _channel =
-      const MethodChannel('speech_recognition');
+  static const MethodChannel _channel = const MethodChannel('speech_recognition');
 
   static final SpeechRecognition _speech = new SpeechRecognition._internal();
 
@@ -19,25 +18,24 @@ class SpeechRecognition {
     _channel.setMethodCallHandler(_platformCallHandler);
   }
 
-  AvailabilityHandler availabilityHandler;
+  AvailabilityHandler? availabilityHandler;
 
-  StringResultHandler currentLocaleHandler;
-  StringResultHandler recognitionResultHandler;
+  StringResultHandler? currentLocaleHandler;
+  StringResultHandler? recognitionResultHandler;
 
-  VoidCallback recognitionStartedHandler;
+  VoidCallback? recognitionStartedHandler;
 
-  VoidCallback speechEndCallbackHandler;
+  VoidCallback? speechEndCallbackHandler;
 
-  StringResultHandler recognitionCompleteHandler;
+  StringResultHandler? recognitionCompleteHandler;
 
-  VoidCallback errorHandler;
+  VoidCallback? errorHandler;
 
   /// ask for speech  recognizer permission
   Future activate() => _channel.invokeMethod("speech.activate");
 
   /// start listening
-  Future listen({String locale}) =>
-      _channel.invokeMethod("speech.listen", locale);
+  Future listen({String? locale}) => _channel.invokeMethod("speech.listen", locale);
 
   /// cancel speech
   Future cancel() => _channel.invokeMethod("speech.cancel");
@@ -49,26 +47,26 @@ class SpeechRecognition {
     print("_platformCallHandler call ${call.method} ${call.arguments}");
     switch (call.method) {
       case "speech.onSpeechAvailability":
-        availabilityHandler(call.arguments);
+        availabilityHandler!(call.arguments);
         break;
       case "speech.onCurrentLocale":
-        currentLocaleHandler(call.arguments);
+        currentLocaleHandler!(call.arguments);
         break;
       case "speech.onSpeech":
-        recognitionResultHandler(call.arguments);
+        recognitionResultHandler!(call.arguments);
         break;
       case "speech.endOfSpeech":
         print("end of speech, transcription may have not arrived yet");
-        speechEndCallbackHandler();
+        speechEndCallbackHandler!();
         break;
       case "speech.onRecognitionStarted":
-        recognitionStartedHandler();
+        recognitionStartedHandler!();
         break;
       case "speech.onRecognitionComplete":
-        recognitionCompleteHandler(call.arguments);
+        recognitionCompleteHandler!(call.arguments);
         break;
       case "speech.onError":
-        errorHandler();
+        errorHandler!();
         break;
       default:
         print('Unknowm method ${call.method} ');
@@ -76,26 +74,20 @@ class SpeechRecognition {
   }
 
   // define a method to handle availability / permission result
-  void setAvailabilityHandler(AvailabilityHandler handler) =>
-      availabilityHandler = handler;
+  void setAvailabilityHandler(AvailabilityHandler handler) => availabilityHandler = handler;
 
   // define a method to handle recognition result
-  void setRecognitionResultHandler(StringResultHandler handler) =>
-      recognitionResultHandler = handler;
+  void setRecognitionResultHandler(StringResultHandler handler) => recognitionResultHandler = handler;
 
   // define a method to handle native call
-  void setRecognitionStartedHandler(VoidCallback handler) =>
-      recognitionStartedHandler = handler;
+  void setRecognitionStartedHandler(VoidCallback handler) => recognitionStartedHandler = handler;
 
   // define a method to handle native call
-  void setRecognitionCompleteHandler(StringResultHandler handler) =>
-      recognitionCompleteHandler = handler;
+  void setRecognitionCompleteHandler(StringResultHandler handler) => recognitionCompleteHandler = handler;
 
-  void setSpeechEndCallbackHandler(VoidCallback handler) =>
-      speechEndCallbackHandler = handler;
+  void setSpeechEndCallbackHandler(VoidCallback handler) => speechEndCallbackHandler = handler;
 
-  void setCurrentLocaleHandler(StringResultHandler handler) =>
-      currentLocaleHandler = handler;
+  void setCurrentLocaleHandler(StringResultHandler handler) => currentLocaleHandler = handler;
 
   void setErrorHandler(VoidCallback handler) => errorHandler = handler;
 }
