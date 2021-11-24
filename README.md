@@ -10,7 +10,7 @@ A flutter plugin to use the speech recognition iOS10+ / Android 4.1+
 ## [Installation](https://pub.dartlang.org/packages/speech_recognition#pub-pkg-tab-installing)
 
 1. Depend on it
-Add this to your package's pubspec.yaml file:
+   Add this to your package's pubspec.yaml file:
 
 ```yaml
 dependencies:
@@ -18,14 +18,14 @@ dependencies:
 ```
 
 2. Install it
-You can install packages from the command line:
+   You can install packages from the command line:
 
 ```
 $ flutter packages get
 ```
 
 3. Import it
-Now in your Dart code, you can use:
+   Now in your Dart code, you can use:
 
 ```dart
 import 'package:speech_recognition/speech_recognition.dart';
@@ -107,7 +107,7 @@ infos.plist, add :
 ## Limitation
 
 On iOS, by default the plugin is configured for French, English, Russian, Spanish, Italian.
-On Android, without additional installations, it will probably works only with the default device locale. 
+On Android, without additional installations, it will probably works only with the default device locale.
 
 ## Troubleshooting
 

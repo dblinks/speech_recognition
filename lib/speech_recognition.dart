@@ -1,22 +1,21 @@
 import 'dart:async';
-import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-typedef void AvailabilityHandler(bool result);
-typedef void StringResultHandler(String text);
+typedef AvailabilityHandler = void Function(bool result);
+typedef StringResultHandler = void Function(String text);
 
-/// the channel to control the speech recognition
 class SpeechRecognition {
-  static const MethodChannel _channel = const MethodChannel('speech_recognition');
+  static const MethodChannel _channel = MethodChannel('speech_recognition');
 
-  static final SpeechRecognition _speech = new SpeechRecognition._internal();
-
-  factory SpeechRecognition() => _speech;
+  static final SpeechRecognition _speech = SpeechRecognition._internal();
 
   SpeechRecognition._internal() {
     _channel.setMethodCallHandler(_platformCallHandler);
   }
+
+  factory SpeechRecognition() => _speech;
 
   AvailabilityHandler? availabilityHandler;
 
@@ -44,7 +43,6 @@ class SpeechRecognition {
   Future stop() => _channel.invokeMethod("speech.stop");
 
   Future _platformCallHandler(MethodCall call) async {
-    print("_platformCallHandler call ${call.method} ${call.arguments}");
     switch (call.method) {
       case "speech.onSpeechAvailability":
         availabilityHandler!(call.arguments);
@@ -56,7 +54,6 @@ class SpeechRecognition {
         recognitionResultHandler!(call.arguments);
         break;
       case "speech.endOfSpeech":
-        print("end of speech, transcription may have not arrived yet");
         speechEndCallbackHandler!();
         break;
       case "speech.onRecognitionStarted":
@@ -69,7 +66,7 @@ class SpeechRecognition {
         errorHandler!();
         break;
       default:
-        print('Unknowm method ${call.method} ');
+        debugPrint('Unknowm method ${call.method} ');
     }
   }
 
